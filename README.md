@@ -1,7 +1,8 @@
 
 
 
-調整設定檔
+# 調整設定檔
+```
 1. Log Basics
 
 # A comma separated list of directories under which to store log files
@@ -13,9 +14,10 @@ log.dirs=/tmp/kafka-logs
 num.partitions=4
 
 這個就會影響到kafka partition數量
-
+```
 
 ## kafka-topics.sh
+```
 1. 創建Topic
    ~/kafka_2.13-3.3.1/bin/kafka-topics.sh --create --bootstrap-server 127.0.0.1:9092 --topic ${topic name}
    ~/kafka_2.13-3.3.1/bin/kafka-topics.sh --create --bootstrap-server 127.0.0.1:9092 --topic test1
@@ -60,9 +62,10 @@ num.partitions=4
 
 
 ==> ~/kafka_2.13-3.3.1/bin/kafka-topics.sh --describe --bootstrap-server localhost:9092  --topic testP
-
+```
 
 ## kafka-run-class.sh
+```
 1. 查看Topic offset
    ~/kafka_2.13-3.3.1/bin/kafka-run-class.sh kafka.tools.GetOffsetShell --broker-list localhost:9092
 
@@ -79,7 +82,7 @@ num.partitions=4
   broker.id=3
   listeners=PLAINTEXT://localhost:9095
   log.dirs=/usr/local/var/lib/kafka-logs/broker3
-
+```
 
 
 
