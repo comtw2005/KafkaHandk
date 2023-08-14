@@ -105,10 +105,102 @@ Topic: testPt	TopicId: XG6Q51S2STK4dycU3G_PdQ	PartitionCount: 4	ReplicationFacto
 ```
 
 
+## kafka-broker-api-versions.sh
+```
+./kafka-broker-api-versions.sh --bootstrap-server 172.20.10.6:9092
+== > 
+macro-VirtualBox:9093 (id: 2 rack: null) -> (
+	Produce(0): 0 to 9 [usable: 9],
+	Fetch(1): 0 to 13 [usable: 13],
+	ListOffsets(2): 0 to 7 [usable: 7],
+	Metadata(3): 0 to 12 [usable: 12],
+	LeaderAndIsr(4): 0 to 6 [usable: 6],
+	StopReplica(5): 0 to 3 [usable: 3],
+	UpdateMetadata(6): 0 to 7 [usable: 7],
+	ControlledShutdown(7): 0 to 3 [usable: 3],
+	OffsetCommit(8): 0 to 8 [usable: 8],
+	OffsetFetch(9): 0 to 8 [usable: 8],
+	FindCoordinator(10): 0 to 4 [usable: 4],
+	JoinGroup(11): 0 to 9 [usable: 9],
+	Heartbeat(12): 0 to 4 [usable: 4],
+	LeaveGroup(13): 0 to 5 [usable: 5],
+	SyncGroup(14): 0 to 5 [usable: 5],
+	DescribeGroups(15): 0 to 5 [usable: 5],
+	ListGroups(16): 0 to 4 [usable: 4],
+	SaslHandshake(17): 0 to 1 [usable: 1],
+	ApiVersions(18): 0 to 3 [usable: 3],
+	CreateTopics(19): 0 to 7 [usable: 7],
+	DeleteTopics(20): 0 to 6 [usable: 6],
+	DeleteRecords(21): 0 to 2 [usable: 2],
+	InitProducerId(22): 0 to 4 [usable: 4],
+	OffsetForLeaderEpoch(23): 0 to 4 [usable: 4],
+	AddPartitionsToTxn(24): 0 to 3 [usable: 3],
+	AddOffsetsToTxn(25): 0 to 3 [usable: 3],
+	EndTxn(26): 0 to 3 [usable: 3],
+	WriteTxnMarkers(27): 0 to 1 [usable: 1],
+	TxnOffsetCommit(28): 0 to 3 [usable: 3],
+	DescribeAcls(29): 0 to 3 [usable: 3],
+	CreateAcls(30): 0 to 3 [usable: 3],
+	DeleteAcls(31): 0 to 3 [usable: 3],
+	DescribeConfigs(32): 0 to 4 [usable: 4],
+	AlterConfigs(33): 0 to 2 [usable: 2],
+	AlterReplicaLogDirs(34): 0 to 2 [usable: 2],
+	DescribeLogDirs(35): 0 to 4 [usable: 4],
+	SaslAuthenticate(36): 0 to 2 [usable: 2],
+	CreatePartitions(37): 0 to 3 [usable: 3],
+	CreateDelegationToken(38): 0 to 3 [usable: 3],
+	RenewDelegationToken(39): 0 to 2 [usable: 2],
+	ExpireDelegationToken(40): 0 to 2 [usable: 2],
+	DescribeDelegationToken(41): 0 to 3 [usable: 3],
+	DeleteGroups(42): 0 to 2 [usable: 2],
+	ElectLeaders(43): 0 to 2 [usable: 2],
+	IncrementalAlterConfigs(44): 0 to 1 [usable: 1],
+	AlterPartitionReassignments(45): 0 [usable: 0],
+	ListPartitionReassignments(46): 0 [usable: 0],
+	OffsetDelete(47): 0 [usable: 0],
+	DescribeClientQuotas(48): 0 to 1 [usable: 1],
+	AlterClientQuotas(49): 0 to 1 [usable: 1],
+	DescribeUserScramCredentials(50): 0 [usable: 0],
+	AlterUserScramCredentials(51): 0 [usable: 0],
+	AlterPartition(56): 0 to 2 [usable: 2],
+	UpdateFeatures(57): 0 to 1 [usable: 1],
+	DescribeCluster(60): 0 [usable: 0],
+	DescribeProducers(61): 0 [usable: 0],
+	DescribeTransactions(65): 0 [usable: 0],
+	ListTransactions(66): 0 [usable: 0],
+	AllocateProducerIds(67): 0 [usable: 0]
+)
+macro-VirtualBox:9091 (id: 1 rack: null) -> (
+	Produce(0): 0 to 9 [usable: 9],
+	Fetch(1): 0 to 13 [usable: 13],
+	ListOffsets(2): 0 to 7 [usable: 7],
+```
 
+## ./bin/zookeeper-shell.sh  172.20.10.6:2181
+列出主題列表的。如果您想要列出目前正在運行的 Kafka Broker，您可以使用 Zookeeper 的命令列工具來查詢。
+./bin/zookeeper-shell.sh  172.20.10.6:2181
+== >
+``` 
+Connecting to 172.20.10.6:2181
+Welcome to ZooKeeper!
+JLine support is disabled
 
+WATCHER::
 
+WatchedEvent state:SyncConnected type:None path:null
+```
+列出註冊在 Zookeeper 中的 Broker ID
+```
+ls /brokers/ids
+[0, 1, 2]
 
+```
+逐一查詢這些 Broker ID 來獲取更多有關每個 Broker 的詳細信息。使用以下命令，將 BROKER_ID 替換為實際的 Broker ID：
+get /brokers/ids/0
+
+```
+{"features":{},"listener_security_protocol_map":{"PLAINTEXT":"PLAINTEXT"},"endpoints":["PLAINTEXT://macro-VirtualBox:9092"],"jmx_port":-1,"port":9092,"host":"macro-VirtualBox","version":5,"timestamp":"1692025259506"}
+```
 
 
 
