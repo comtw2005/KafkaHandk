@@ -304,6 +304,7 @@ SSL加密通訊（SSL）。
 
 ####
 ls -rlt /home/macro/Certificate/
+```
 -rw------- 1 macro macro 1679  八  20 00:23 root.key
 -rw-rw-r-- 1 macro macro 1395  八  20 00:24 root.crt
 -rw------- 1 macro macro 1675  八  20 00:24 server.key
@@ -314,10 +315,9 @@ ls -rlt /home/macro/Certificate/
 -rw-rw-r-- 1 macro macro   41  八  20 00:38 root.srl
 -rw-rw-r-- 1 macro macro 1208  八  20 00:38 kafka01.signed.crt
 -rw-rw-r-- 1 macro macro 5054  八  20 00:39 kafka01.keystore.jks
+```
 
 Step 4: Restart Your Kafka Cluster
-
-
 Step 5: Testing Your Configuration
 	# openssl s_client -debug -connect kafka01.mycompany.com:9093 -tls1
 
@@ -338,18 +338,11 @@ $ keytool -keystore scheduler.truststore.jks -alias CARoot -import -file root.cr
 keytool -keystore scheduler.keystore.jks -alias vsched -validity 365 -genkey -keyalg RSA  -dname CN=*.mycompany.com
 
 
-
-
-
-
 = = = Client Filebeat
 
 #生成客户端csr证书请求文件
-(X)openssl req -newkey rsa:2048 -days 1000 -nodes -keyout client.key -subj /CN=client.t.com/OU=Development\ group/O=Home\ SIA/DC=elk/DC=com > client.csr
-(X)openssl req -newkey rsa:2048 -days 1000 -nodes -keyout client.key -subj CN=172.20.38.6 OU=GG O=GG DC=GG DC=com > client.csr
 openssl req -newkey rsa:2048 -days 1000 -nodes -keyout client.key -subj /CN=c172.20.10.6/OU=Development\ group/O=GG\ SIA/DC=GG/DC=com > client.csr
 #使用ca证书与私钥签发客户端证书
-(X)openssl x509 -req -in client.csr -days 1000 -CA ca.crt -CAkey ca.key -set_serial 01 > client.crt
 openssl x509 -req -in client.csr -days 1000 -CA root.crt -CAkey root.key -set_serial 01 > client.crt
  
 filebeat.yml
