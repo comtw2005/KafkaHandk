@@ -1,0 +1,16 @@
+情境:
+調整 config/server.properties重啟kafka, server重啟失敗拋出
+kafka.common.inconsistentclusteridexception the cluster id doesn't match stored clusterid some.
+
+
+
+
+
+情境:
+三台主機, 設定檔key相同, meta.properties 的cluster就會相同, 如果設定檔不同, 就會導致cluster不同, 會沒辦法在leader上.
+
+
+
+
+
+
