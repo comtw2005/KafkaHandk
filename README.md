@@ -1,6 +1,4 @@
 
-
-
 # 調整設定檔
 ```
 1. Log Basics
@@ -18,53 +16,6 @@ num.partitions=4
 
 ## kafka-topics.sh
 ```
-1. 創建Topic
-   ~/kafka_2.13-3.3.1/bin/kafka-topics.sh --create --bootstrap-server 127.0.0.1:9092 --topic ${topic name}
-   ~/kafka_2.13-3.3.1/bin/kafka-topics.sh --create --bootstrap-server 127.0.0.1:9092 --topic test1
-   ==> Created topic test1.
-
-   建立副本
-   --replication-factor 副本數為6
-   ~/kafka_2.13-3.3.1/bin/kafka-topics.sh --create --bootstrap-server 127.0.0.1:9092 --replication-factor 2 --partitions 3 --topic testP
-   ==> Created topic testP.
-
-    --topic：指定主題名稱。
-    --partitions：指定主題的分區數量。
-    --replication-factor：指定每個分區的複製因子（副本數量）。
-    --bootstrap-server：指定 Kafka 伺服器的連線位置，例如 localhost:9092。
-
-3. 查看查看所有的Topic
-   ~/kafka_2.13-3.3.1/bin/kafka-topics.sh --list --bootstrap-server localhost:9092
-   ==> test1
-
-5. 查看版本
-   ~/kafka_2.13-3.3.1/bin/kafka-topics.sh --version
-   ==> 3.3.1 (Commit:e23c59d00e687ff5)
-  
-7. 刪除 Topic
-   ~/kafka_2.13-3.3.1/bin/kafka-topics.sh -delete --bootstrap-server localhost:9092 --topic test1
-
-9. Topic 詳細描述
-   kafka-topics.sh
-   ~/kafka_2.13-3.3.1/bin/kafka-topics.sh --describe --bootstrap-server localhost:9092  --topic test1
-
-==> Topic: test1	TopicId: aKGLhOFLSw2TJlcEaTKQOQ	PartitionCount: 4	ReplicationFactor: 1	Configs: 
-   	Topic: test1	Partition: 0	Leader: 0	Replicas: 0	Isr: 0
-	  Topic: test1	Partition: 1	Leader: 0	Replicas: 0	Isr: 0
-	  Topic: test1	Partition: 2	Leader: 0	Replicas: 0	Isr: 0
-	  Topic: test1	Partition: 3	Leader: 0	Replicas: 0	Isr: 0
-
-    Partition: 0 => 代表該 Topic 編號0的partition
-    Leader: 0 => 表示 partition 0的 leader 位於哪個 broker，因為只有一個 broker，所以就是在 Broker 0
-    Replicas: 0 => 表示有幾個備份
-    Isr: 1 => 表示在哪幾個 broker 可以找到這個 partition
-
-==> 如果有備份
-    Topic: testP	TopicId: 2IUT_zjzRQqKYQeuBVmhTA	PartitionCount: 3	ReplicationFactor: 2	Configs: 
-	  Topic: testP	Partition: 0	Leader: 2	Replicas: 2,0	Isr: 2,0
-	  Topic: testP	Partition: 1	Leader: 1	Replicas: 1,2	Isr: 1,2
-	  Topic: testP	Partition: 2	Leader: 0	Replicas: 0,1	Isr: 0,1
-
 
 ==> 將副本放置於其他主機上
      ~/kafka_2.13-3.3.1/bin/kafka-topics.sh --create --bootstrap-server localhost:9091,localhost:9092,localhost:9093 --replication-factor 2 --partitions 4 --topic testP3
@@ -319,12 +270,12 @@ ls -rlt /home/macro/Certificate/
 
 Step 4: Restart Your Kafka Cluster
 Step 5: Testing Your Configuration
-	# openssl s_client -debug -connect kafka01.mycompany.com:9093 -tls1
+```
+# openssl s_client -debug -connect kafka01.mycompany.com:9093 -tls1
+```
 
-
-= = = = = = = = = = = = = = = = 
+= = = = = = = = = = = = = = = =  
 Kafka TLS/SSL Example Part 4: Loading Data Directly From Kafka (我沒做)
-
 = = = = = = = = = = = = = = = = 
 $ export KVERTICA_PASS=server_key_password
 $ vsql
