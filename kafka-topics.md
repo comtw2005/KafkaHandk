@@ -1,22 +1,25 @@
 ## kafka-topics.sh
 
 1. 查看版本
+   ```
    ~/kafka_2.13-3.3.1/bin/kafka-topics.sh --version
    ==> 3.3.1 (Commit:e23c59d00e687ff5)
-   
-2. 查看查看所有的Topic
+   ```
+3. 查看查看所有的Topic
+   ```
    ~/kafka_2.13-3.3.1/bin/kafka-topics.sh --list --bootstrap-server localhost:9092
    ==> test1
-   
-3. 創建Topic，預設
+   ```
+5. 創建Topic，預設
+   ```
    ~/kafka_2.13-3.3.1/bin/kafka-topics.sh --create --bootstrap-server 127.0.0.1:9092 --topic ${topic name}
    ~/kafka_2.13-3.3.1/bin/kafka-topics.sh --create --bootstrap-server 127.0.0.1:9092 --topic test1
    ==> Created topic test1.
-
-4. 創建Topic，建立副本
+   ```
+7. 創建Topic，建立副本
 ~/kafka_2.13-3.3.1/bin/kafka-topics.sh --create --bootstrap-server ${IP:Port} --replication-factor ${int} --partitions ${int} --topic ${topic name}
 
-5. Topic，詳細描述
+8. Topic，詳細描述
 ~/kafka_2.13-3.3.1/bin/kafka-topics.sh --describe --bootstrap-server ${IP:Port}  --topic ${topic name}
 
 ```
