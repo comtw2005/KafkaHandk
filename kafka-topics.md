@@ -17,11 +17,13 @@
    ==> Created topic test1.
    ```
 7. 創建Topic，建立副本
-~/kafka_2.13-3.3.1/bin/kafka-topics.sh --create --bootstrap-server ${IP:Port} --replication-factor ${int} --partitions ${int} --topic ${topic name}
-
-8. Topic，詳細描述
-~/kafka_2.13-3.3.1/bin/kafka-topics.sh --describe --bootstrap-server ${IP:Port}  --topic ${topic name}
-
+   ```
+   ~/kafka_2.13-3.3.1/bin/kafka-topics.sh --create --bootstrap-server ${IP:Port} --replication-factor ${int} --partitions ${int} --topic ${topic name}
+   ```
+9. Topic，詳細描述
+    ```
+    ~/kafka_2.13-3.3.1/bin/kafka-topics.sh --describe --bootstrap-server ${IP:Port}  --topic ${topic name}
+    ```
 ```
    ~/kafka_2.13-3.3.1/bin/kafka-topics.sh --create --bootstrap-server ${IP:Port} --replication-factor ${int} --partitions ${int} --topic ${topic name}
 
@@ -30,6 +32,15 @@
    --replication-factor：指定每個分區的複製因子（副本數量）。將每一個分區複製到其中兩個 broker 上。
    --bootstrap-server：指定 Kafka 伺服器的連線位置，例如 localhost:9092。
 ```
+10. 刪除 Topic
+   ~/kafka_2.13-3.3.1/bin/kafka-topics.sh -delete --bootstrap-server localhost:9092 --topic test1
+
+
+
+
+
+
+
 
 case 1. 設定黨為預設條件, 指令優先處理
 confing/server.preperies 
@@ -49,9 +60,34 @@ partition = 4
 	  Topic: test1	Partition: 3	Leader: 0	Replicas: 0	Isr: 0
 ```
 
+case 2. 一個zookpeer, 三個break.
 
+準備三個設定黨
+```
+cd ~/kafka_2.13-3.3.1/confing/
+cp server.properties server-1.properties
+cp server.properties server-2.properties
+cp server.properties server-3.properties
+```
+依序修改設定檔
+1. 調整 port, 每台都要不一樣
+2. 每個 broker 的 id 必須不同
+3. log.dirs 就是讓訊息所謂持久化存放的位置，依照 broker 區分不能重複
+```
+broker.id=0 # 與Leader對應
+listeners=PLAINTEXT://localhost:9092  # port要不一樣
+log.dirs=/tmp/kafka-logs-1 # path要不一樣
+```
 
-case 2.
+啟動broker
+```
+cd   ~/kafka_2.13-3.3.1/
+~/kafka_2.13-3.3.1/bin/kafka-server-start.sh ~/kafka_2.13-3.3.1/confing/server-1.properties
+~/kafka_2.13-3.3.1/bin/kafka-server-start.sh ~/kafka_2.13-3.3.1/confing/server-2.properties
+~/kafka_2.13-3.3.1/bin/kafka-server-start.sh ~/kafka_2.13-3.3.1/confing/server-3.properties
+```
+
+建置topic
 ```
    ~/kafka_2.13-3.3.1/bin/kafka-topics.sh --create --bootstrap-server 127.0.0.1:9092 --replication-factor 2 --partitions 3 --topic testP
    ==> Created topic testP.
@@ -69,12 +105,11 @@ Isr: 1, 0 => 代表我們當前可以在 broker2 和 broker0 上訪問該 partit
 => Isr 的全名為in-sync replica，也就是已同步的副本
 
 
-
 ==> 將副本放置於其他主機上
      ~/kafka_2.13-3.3.1/bin/kafka-topics.sh --create --bootstrap-server localhost:9091,localhost:9092,localhost:9093 --replication-factor 2 --partitions 4 --topic testP3
 ==> 確認topic 詳細資料, 同時確認連線 (有連線問題時), 會顯示 Broker may not be available , 因為9095跟9090是不存在的
     ~/kafka_2.13-3.3.1/bin/kafka-topics.sh --describe --topic testPt --bootstrap-server localhost:9095,localhost:9090,localhost:9093
-
+```
 [2023-08-14 06:51:45,731] WARN [AdminClient clientId=adminclient-1] Connection to node -1 (localhost/172.20.10.6:9095) could not be established. Broker may not be available. (org.apache.kafka.clients.NetworkClient)
 [2023-08-14 06:51:45,742] WARN [AdminClient clientId=adminclient-1] Connection to node -2 (localhost/172.20.10.6:9090) could not be established. Broker may not be available. (org.apache.kafka.clients.NetworkClient)
 Topic: testPt	TopicId: XG6Q51S2STK4dycU3G_PdQ	PartitionCount: 4	ReplicationFactor: 2	Configs: 
@@ -82,6 +117,17 @@ Topic: testPt	TopicId: XG6Q51S2STK4dycU3G_PdQ	PartitionCount: 4	ReplicationFacto
 	Topic: testPt	Partition: 1	Leader: 1	Replicas: 1,2	Isr: 1,2
 	Topic: testPt	Partition: 2	Leader: 0	Replicas: 0,1	Isr: 0,1
 	Topic: testPt	Partition: 3	Leader: 2	Replicas: 2,1	Isr: 2,1
+```
+
+
+模擬其中一個 broker 壞掉後再恢復的情況
+
+kafka-topics --describe --zookeeper 127.0.0.1:2181 --topic topicWithThreeBroker
+
+Topic: topicWithThreeBroker	TopicId: BAocHAwHR_STmwAUlI3YMw	PartitionCount: 3	ReplicationFactor: 2	Configs:
+	Topic: topicWithThreeBroker	Partition: 0	Leader: 1	Replicas: 1,0	Isr: 1
+	Topic: topicWithThreeBroker	Partition: 1	Leader: 2	Replicas: 2,1	Isr: 2,1
+	Topic: topicWithThreeBroker	Partition: 2	Leader: 2	Replicas: 0,2	Isr: 2
 
 
 
@@ -101,6 +147,5 @@ Topic: testPt	TopicId: XG6Q51S2STK4dycU3G_PdQ	PartitionCount: 4	ReplicationFacto
 
 
 
-7. 刪除 Topic
-   ~/kafka_2.13-3.3.1/bin/kafka-topics.sh -delete --bootstrap-server localhost:9092 --topic test1
+
 
