@@ -105,9 +105,9 @@ Isr: 1, 0 => 代表我們當前可以在 broker2 和 broker0 上訪問該 partit
 => Isr 的全名為in-sync replica，也就是已同步的副本
 
 
-==> 將副本放置於其他主機上
+將副本放置於其他主機上
      ~/kafka_2.13-3.3.1/bin/kafka-topics.sh --create --bootstrap-server localhost:9091,localhost:9092,localhost:9093 --replication-factor 2 --partitions 4 --topic testP3
-==> 確認topic 詳細資料, 同時確認連線 (有連線問題時), 會顯示 Broker may not be available , 因為9095跟9090是不存在的
+確認topic 詳細資料, 同時確認連線 (有連線問題時), 會顯示 Broker may not be available , 因為9095跟9090是不存在的
     ~/kafka_2.13-3.3.1/bin/kafka-topics.sh --describe --topic testPt --bootstrap-server localhost:9095,localhost:9090,localhost:9093
 ```
 [2023-08-14 06:51:45,731] WARN [AdminClient clientId=adminclient-1] Connection to node -1 (localhost/172.20.10.6:9095) could not be established. Broker may not be available. (org.apache.kafka.clients.NetworkClient)
@@ -121,14 +121,16 @@ Topic: testPt	TopicId: XG6Q51S2STK4dycU3G_PdQ	PartitionCount: 4	ReplicationFacto
 
 
 模擬其中一個 broker 壞掉後再恢復的情況
-
+注意, 即便恢復了 kafka也不會馬上復原,
+而是需要再透過指令重新指派leader
+```
 kafka-topics --describe --zookeeper 127.0.0.1:2181 --topic topicWithThreeBroker
 
 Topic: topicWithThreeBroker	TopicId: BAocHAwHR_STmwAUlI3YMw	PartitionCount: 3	ReplicationFactor: 2	Configs:
 	Topic: topicWithThreeBroker	Partition: 0	Leader: 1	Replicas: 1,0	Isr: 1
 	Topic: topicWithThreeBroker	Partition: 1	Leader: 2	Replicas: 2,1	Isr: 2,1
 	Topic: topicWithThreeBroker	Partition: 2	Leader: 2	Replicas: 0,2	Isr: 2
-
+```
 
 
 
