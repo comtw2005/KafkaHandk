@@ -25,3 +25,12 @@ $HOME/kafka_2.13-3.3.1/bin/kafka-topics.sh --delete --bootstrap-server 172.20.10
 $HOME/kafka_2.13-3.3.1/bin/kafka-console-producer.sh --bootstrap-server 172.20.10.6:9092 --topic test2
 $HOME/kafka_2.13-3.3.1/bin/kafka-console-consumer.sh --bootstrap-server 172.20.10.6:9092 --topic test2 --from-beginning
 ```
+
+6. 
+```
+$HOME/kafka-run-class.sh kafka.tools.GetOffsetShell --broker-list 192.168.43.15:9092 --topic test2  --time -1
+```
+从上述的命令解析可以看到，
+--time -1 表示获取的最新位移值
+--time -2 表示获取的最早的位移值，可能由于最早的数据由于过期被删除，所以最早的位移不一定是0
+通过两数相减，就可以知道当前分区的数据条数。
