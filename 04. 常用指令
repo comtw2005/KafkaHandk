@@ -1,0 +1,27 @@
+1. 啟動
+```
+$HOME/kafka_2.13-3.3.1/bin/zookeeper-server-start.sh -daemon $HOME/kafka_2.13-3.3.1/config/zookeeper.properties
+$HOME/kafka_2.13-3.3.1/bin/kafka-server-start.sh -daemon $HOME/kafka_2.13-3.3.1/config/server.properties
+```
+
+2. 查看指定的Topic
+```
+$HOME/kafka_2.13-3.3.1/bin/kafka-topics.sh --describe --bootstrap-server localhost:9092 --topic test1 
+```
+
+3. 版本
+```
+$HOME/kafka_2.13-3.3.1/bin/kafka-topics.sh --version
+```
+
+4. 建置/刪除topic
+```
+$HOME/kafka_2.13-3.3.1/bin/kafka-topics.sh --create --bootstrap-server 172.20.10.6:9092 --replication-factor 1 --partitions 1 --topic test2
+$HOME/kafka_2.13-3.3.1/bin/kafka-topics.sh --delete --bootstrap-server 172.20.10.6:9092 --topic test2
+```
+
+5. producer/consumer
+```
+$HOME/kafka_2.13-3.3.1/bin/kafka-console-producer.sh --bootstrap-server 172.20.10.6:9092 --topic test2
+$HOME/kafka_2.13-3.3.1/bin/kafka-console-consumer.sh --bootstrap-server 172.20.10.6:9092 --topic test2 --from-beginning
+```
