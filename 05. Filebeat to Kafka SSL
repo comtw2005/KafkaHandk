@@ -1,0 +1,158 @@
+
+
+### SSL 連線
+
+Step 1 : 憑證產製
+
+
+Kafka TLS/SSL Example
+Part 1: Create the Root CA.
+Part 2: Configure Vertica for Mutual Authentication.
+Part 3: Configure Kafka.
+Part 4: Loading Data Directly From Kafka.
+Part 5: Configure the Scheduler.
+
+Part 1: Create the Root CA
+```
+1. Generate a private key named root.key. 
+   $ openssl genrsa -out root.key
+
+2.Generating a self-signed root CA named root.crt.
+   $ openssl req -new -x509 -key root.key -out root.crt
+```
+
+Part 2: Configure Vertica for Mutual Authentication
+```
+Step 1: Create Server Key and Certificate
+   $ openssl genrsa -out server.key
+
+   $ openssl req -new -key server.key -out server_reqout.txt
+
+Sign the certificate request with the root CA:
+   $ openssl x509 -req -in server_reqout.txt -days 3650 -sha256 -CAcreateserial -CA root.crt -CAkey root.key -out server.crt
+```
+
+
+Part 3: Configure Kafka
+```
+Step 1: Create the Truststore and Keystore 
+	$ keytool -keystore kafka.truststore.jks -alias CARoot -import -file root.crt
+
+	$ keytool -keystore kafka01.keystore.jks -alias localhost -validity 365 -genkey -keyalg RSA -ext SAN=DNS:172.20.10.6
+
+	$ keytool -keystore kafka01.keystore.jks -alias localhost -certreq -file kafka01.unsigned.crt
+
+
+	$ openssl x509 -req -CA root.crt -CAkey root.key -in kafka01.unsigned.crt -out kafka01.signed.crt -days 365 -CAcreateserial
+			 
+	$ keytool -keystore kafka01.keystore.jks -alias CARoot -import -file root.crt
+
+	$ keytool -keystore kafka01.keystore.jks -alias localhost  -import -file kafka01.signed.crt
+			   
+	$ scp kafka.truststore.jks kafka01.keystore.jks root@kafka01.mycompany.com:
+
+Step 2: Letting Kafka Read the Keystore and Truststore Files
+
+	~# cd /opt/kafka/config/
+	/opt/kafka/config# cp /root/kafka01.keystore.jks /root/kafka.truststore.jks .
+
+Step 3: Edit the Kafka Configuration to Use TLS/SSL Encryption(不一定要做)
+	su -s /bin/bash kafka
+```
+
+#### 調整設定檔
+
+```
+listeners=SSL://:9093
+#listeners=PLAINTEXT://:9092,SSL://:9093
+
+# Listener name, hostname and port the broker will advertise to clients.
+# If not set, it uses the value for "listeners".
+#advertised.listeners=PLAINTEXT://your.host.name:9092
+#advertised.listeners=PLAINTEXT://172.20.10.6:9092,PLAINTEXT2://172.20.10.6:9091
+#advertised.listeners=PLAINTEXT://172.20.10.6:9092,SSL://172.20.10.6:9093
+advertised.listeners=SSL://172.20.10.6:9093
+
+```
+listeners 依照需求看是不是要保留9092連線
+
+
+
+
+```
+ssl.keystore.location=/home/macro/Certificate/kafka01.keystore.jks
+ssl.keystore.password=vertica
+ssl.key.password=111111
+ssl.truststore.location=//home/macro/Certificate/kafka.truststore.jks
+ssl.truststore.password=111111
+ssl.enabled.protocols=TLSv1.2,TLSv1.1,TLSv1
+ssl.client.auth=required
+```
+SSL加密通訊（SSL）。
+- `ssl.keystore.location` 和 `ssl.keystore.password`：指定使用的keystore的位置和密碼。
+- `ssl.truststore.location` 和 `ssl.truststore.password`：指定使用的truststore的位置和密碼。
+- `ssl.protocol`：指定使用的SSL協議版本。
+- `ssl.client.auth`：啟用或禁用客戶端驗證。
+
+
+
+####
+ls -rlt /home/macro/Certificate/
+```
+-rw------- 1 macro macro 1679  八  20 00:23 root.key
+-rw-rw-r-- 1 macro macro 1395  八  20 00:24 root.crt
+-rw------- 1 macro macro 1675  八  20 00:24 server.key
+-rw-rw-r-- 1 macro macro 1094  八  20 00:25 server_reqout.txt
+-rw-rw-r-- 1 macro macro 1273  八  20 00:29 server.crt
+-rw-rw-r-- 1 macro macro 1366  八  20 00:37 kafka.truststore.jks
+-rw-rw-r-- 1 macro macro 1051  八  20 00:38 kafka01.unsigned.crt
+-rw-rw-r-- 1 macro macro   41  八  20 00:38 root.srl
+-rw-rw-r-- 1 macro macro 1208  八  20 00:38 kafka01.signed.crt
+-rw-rw-r-- 1 macro macro 5054  八  20 00:39 kafka01.keystore.jks
+```
+
+Step 4: Restart Your Kafka Cluster
+Step 5: Testing Your Configuration
+```
+# openssl s_client -debug -connect kafka01.mycompany.com:9093 -tls1
+```
+
+Kafka TLS/SSL Example Part 4: Loading Data Directly From Kafka (我沒做)
+```
+$ export KVERTICA_PASS=server_key_password
+$ vsql
+```
+
+Kafka TLS-SSL Example Part 5: Configure the Scheduler (我沒做)
+```
+$ keytool -keystore scheduler.truststore.jks -alias CARoot -import -file root.crt
+
+keytool -keystore scheduler.keystore.jks -alias vsched -validity 365 -genkey -keyalg RSA  -dname CN=*.mycompany.com
+```
+
+= = = Client Filebeat
+
+#生成客户端csr证书请求文件
+openssl req -newkey rsa:2048 -days 1000 -nodes -keyout client.key -subj /CN=c172.20.10.6/OU=Development\ group/O=GG\ SIA/DC=GG/DC=com > client.csr
+#使用ca证书与私钥签发客户端证书
+openssl x509 -req -in client.csr -days 1000 -CA root.crt -CAkey root.key -set_serial 01 > client.crt
+ 
+filebeat.yml
+
+```
+output.kafka:
+   enabled: true
+   hosts: ["172.20.10.6:9093"]
+   topic: "test1"
+   ssl.enabled: true
+# Optional SSL. By default is off.
+# List of root certificates for HTTPS server verifications
+   ssl.certificate_authorities: ["/home/macro/Certificate/root.crt"]
+
+# Certificate for SSL client authentication
+   ssl.certificate: "/home/macro/Certificate/client.crt"
+
+# Client Certificate Key
+   ssl.key: "/home/macro/Certificate/client.key"
+
+```
